@@ -1,6 +1,9 @@
 namespace SpriteKind {
     export const BoundingBox = SpriteKind.create()
 }
+/**
+ * Look at SpawnRowOfBlocks function in Araknoid clone
+ */
 function createBoundBox () {
     mySprite = sprites.create(img`
         ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
@@ -9,6 +12,21 @@ function createBoundBox () {
         ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
         `, SpriteKind.BoundingBox)
     mySprite.setPosition(90, 116)
+}
+function SpawnBlocks (Difficulty: number, BlockArray: any[]) {
+    CurrentBlock = 0
+    BlockX = 8
+    BlockY = 10
+    gap = 1
+    for (let index = 0; index <= 2; index++) {
+        for (let index = 0; index <= 9; index++) {
+            let list: Sprite[] = []
+            mySprite2 = sprites.create(list[CurrentBlock].image, list[CurrentBlock].kind())
+            BlockX += 10
+        }
+        BlockY += BlueBlock.height + gap
+        BlockX = 8
+    }
 }
 function bounce (ball: Sprite) {
     if (Ball.vx < 0) {
@@ -59,8 +77,10 @@ function pickblock (Red: number, Yellow: number, Blue: number) {
     return SetBlock
 }
 sprites.onOverlap(SpriteKind.Food, SpriteKind.BoundingBox, function (sprite, otherSprite) {
+    sprites.destroy(paddle)
     sprites.destroy(sprite)
     info.changeLifeBy(-1)
+    SpawnPaddle()
     pause(500)
     SpawnBall()
 })
@@ -91,37 +111,37 @@ function FillBlockArray (Red: number, Yellow: number, Blue: number) {
         `, SpriteKind.Player)
     Row1 = [[
     pickblock(Red, Yellow, Blue),
-    1,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
+    pickblock(Red, Yellow, Blue),
+    pickblock(Red, Yellow, Blue),
+    pickblock(Red, Yellow, Blue),
+    pickblock(Red, Yellow, Blue),
+    pickblock(Red, Yellow, Blue),
+    pickblock(Red, Yellow, Blue),
+    pickblock(Red, Yellow, Blue),
+    pickblock(Red, Yellow, Blue),
+    pickblock(Red, Yellow, Blue)
     ], [
-    0,
-    1,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
+    pickblock(Red, Yellow, Blue),
+    pickblock(Red, Yellow, Blue),
+    pickblock(Red, Yellow, Blue),
+    pickblock(Red, Yellow, Blue),
+    pickblock(Red, Yellow, Blue),
+    pickblock(Red, Yellow, Blue),
+    pickblock(Red, Yellow, Blue),
+    pickblock(Red, Yellow, Blue),
+    pickblock(Red, Yellow, Blue),
+    pickblock(Red, Yellow, Blue)
     ], [
-    0,
-    1,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
+    pickblock(Red, Yellow, Blue),
+    pickblock(Red, Yellow, Blue),
+    pickblock(Red, Yellow, Blue),
+    pickblock(Red, Yellow, Blue),
+    pickblock(Red, Yellow, Blue),
+    pickblock(Red, Yellow, Blue),
+    pickblock(Red, Yellow, Blue),
+    pickblock(Red, Yellow, Blue),
+    pickblock(Red, Yellow, Blue),
+    pickblock(Red, Yellow, Blue)
     ]]
 }
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
@@ -130,7 +150,6 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSpr
 })
 let Row1: Sprite[][] = []
 let GreenBlock: Sprite = null
-let BlueBlock: Sprite = null
 let YellowBlock: Sprite = null
 let RedBlock: Sprite = null
 let SetBlock: Sprite = null
@@ -140,8 +159,15 @@ let paddle: Sprite = null
 let BallYSPeed = 0
 let ballXSpeed = 0
 let Ball: Sprite = null
+let BlueBlock: Sprite = null
+let mySprite2: Sprite = null
+let gap = 0
+let BlockY = 0
+let BlockX = 0
+let CurrentBlock = 0
 let mySprite: Sprite = null
 info.setLife(50)
 SpawnBall()
 SpawnPaddle()
 createBoundBox()
+let DifficultyModifier = 1
