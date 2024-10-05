@@ -13,19 +13,24 @@ function createBoundBox () {
         `, SpriteKind.BoundingBox)
     mySprite.setPosition(90, 116)
 }
-function SpawnBlocks (Difficulty: number, BlockArray: any[]) {
-    CurrentBlock = 0
-    BlockX = 8
-    BlockY = 10
+function SpawnBlocks (Difficulty: number) {
+    Red = 0
+    Yellow = 0
+    Blue = 0
+    BlocksOnScreen = 0
+    BlockX = 10
+    BlockY = 15
     gap = 1
     for (let index = 0; index <= 2; index++) {
-        for (let index = 0; index <= 9; index++) {
-            let list: Sprite[] = []
-            mySprite2 = sprites.create(list[CurrentBlock].image, list[CurrentBlock].kind())
+        for (let index = 0; index <= 14; index++) {
+            CurrentBlock = pickblock(75, 85, 99)
+            mySprite2 = sprites.create(CurrentBlock.image, CurrentBlock.kind())
+            mySprite2.setPosition(BlockX, BlockY)
             BlockX += 10
+            BlocksOnScreen += 1
         }
         BlockY += BlueBlock.height + gap
-        BlockX = 8
+        BlockX = 10
     }
 }
 function bounce (ball: Sprite) {
@@ -64,27 +69,6 @@ function SpawnPaddle () {
     controller.moveSprite(paddle, paddleSpeed, 0)
 }
 function pickblock (Red: number, Yellow: number, Blue: number) {
-    PickBlockVariable = randint(1, 100)
-    if (PickBlockVariable <= Red) {
-        SetBlock = RedBlock
-    } else if (PickBlockVariable > Red && PickBlockVariable <= Yellow) {
-        SetBlock = YellowBlock
-    } else if (PickBlockVariable > Yellow) {
-        SetBlock = BlueBlock
-    } else if (PickBlockVariable == Blue) {
-        SetBlock = GreenBlock
-    }
-    return SetBlock
-}
-sprites.onOverlap(SpriteKind.Food, SpriteKind.BoundingBox, function (sprite, otherSprite) {
-    sprites.destroy(paddle)
-    sprites.destroy(sprite)
-    info.changeLifeBy(-1)
-    SpawnPaddle()
-    pause(500)
-    SpawnBall()
-})
-function FillBlockArray (Red: number, Yellow: number, Blue: number) {
     RedBlock = sprites.create(img`
         2 2 2 2 2 2 2 2 
         2 2 2 2 2 2 2 2 
@@ -109,51 +93,34 @@ function FillBlockArray (Red: number, Yellow: number, Blue: number) {
         7 7 7 7 7 7 7 7 
         7 7 7 7 7 7 7 7 
         `, SpriteKind.Player)
-    Row1 = [[
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue)
-    ], [
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue)
-    ], [
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue),
-    pickblock(Red, Yellow, Blue)
-    ]]
+    PickBlockVariable = randint(0, 101)
+    if (PickBlockVariable <= Red) {
+        return RedBlock
+    } else if (PickBlockVariable > Red && PickBlockVariable <= Yellow) {
+        return YellowBlock
+    } else if (PickBlockVariable > Yellow) {
+        return BlueBlock
+    } else if (PickBlockVariable == Blue) {
+        return GreenBlock
+    }
+    return RedBlock
 }
+sprites.onOverlap(SpriteKind.Food, SpriteKind.BoundingBox, function (sprite, otherSprite) {
+    sprites.destroy(paddle)
+    sprites.destroy(sprite)
+    info.changeLifeBy(-1)
+    SpawnPaddle()
+    pause(500)
+    SpawnBall()
+})
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
     bounce(otherSprite)
     otherSprite.setPosition(otherSprite.x, sprite.top - 1)
 })
-let Row1: Sprite[][] = []
+let PickBlockVariable = 0
 let GreenBlock: Sprite = null
 let YellowBlock: Sprite = null
 let RedBlock: Sprite = null
-let SetBlock: Sprite = null
-let PickBlockVariable = 0
 let paddleSpeed = 0
 let paddle: Sprite = null
 let BallYSPeed = 0
@@ -161,12 +128,17 @@ let ballXSpeed = 0
 let Ball: Sprite = null
 let BlueBlock: Sprite = null
 let mySprite2: Sprite = null
+let CurrentBlock: Sprite = null
 let gap = 0
 let BlockY = 0
 let BlockX = 0
-let CurrentBlock = 0
+let BlocksOnScreen = 0
+let Blue = 0
+let Yellow = 0
+let Red = 0
 let mySprite: Sprite = null
 info.setLife(50)
+SpawnBlocks(1)
 SpawnBall()
 SpawnPaddle()
 createBoundBox()
