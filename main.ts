@@ -1,5 +1,9 @@
 namespace SpriteKind {
     export const BoundingBox = SpriteKind.create()
+    export const RedBlock = SpriteKind.create()
+    export const YellowBlock = SpriteKind.create()
+    export const BlueBlock = SpriteKind.create()
+    export const GreenBlock = SpriteKind.create()
 }
 /**
  * Look at SpawnRowOfBlocks function in Araknoid clone
@@ -14,6 +18,34 @@ function createBoundBox () {
     mySprite.setPosition(90, 116)
 }
 function SpawnBlocks (Difficulty: number) {
+    RedBlock = sprites.create(img`
+        2 2 2 2 2 2 2 2 
+        2 2 2 2 2 2 2 2 
+        2 2 2 2 2 2 2 2 
+        2 2 2 2 2 2 2 2 
+        `, SpriteKind.RedBlock)
+    YellowBlock = sprites.create(img`
+        5 5 5 5 5 5 5 5 
+        5 5 5 5 5 5 5 5 
+        5 5 5 5 5 5 5 5 
+        5 5 5 5 5 5 5 5 
+        `, SpriteKind.YellowBlock)
+    BlueBlock = sprites.create(img`
+        8 8 8 8 8 8 8 8 
+        8 8 8 8 8 8 8 8 
+        8 8 8 8 8 8 8 8 
+        8 8 8 8 8 8 8 8 
+        `, SpriteKind.BlueBlock)
+    GreenBlock = sprites.create(img`
+        7 7 7 7 7 7 7 7 
+        7 7 7 7 7 7 7 7 
+        7 7 7 7 7 7 7 7 
+        7 7 7 7 7 7 7 7 
+        `, SpriteKind.GreenBlock)
+    sprites.destroyAllSpritesOfKind(SpriteKind.RedBlock)
+    sprites.destroyAllSpritesOfKind(SpriteKind.YellowBlock)
+    sprites.destroyAllSpritesOfKind(SpriteKind.BlueBlock)
+    sprites.destroyAllSpritesOfKind(SpriteKind.GreenBlock)
     Red = 0
     Yellow = 0
     Blue = 0
@@ -55,6 +87,16 @@ function SpawnBall () {
     Ball.setVelocity(ballXSpeed, BallYSPeed)
     Ball.setBounceOnWall(true)
 }
+sprites.onOverlap(SpriteKind.YellowBlock, SpriteKind.Food, function (sprite, otherSprite) {
+    bounce(otherSprite)
+    otherSprite.setPosition(otherSprite.x, sprite.top + 3)
+    mySprite2 = sprites.create(img`
+        2 2 2 2 2 2 2 2 
+        2 2 2 2 2 2 2 2 
+        2 2 2 2 2 2 2 2 
+        2 2 2 2 2 2 2 2 
+        `, SpriteKind.RedBlock)
+})
 function SpawnPaddle () {
     paddle = sprites.create(img`
         9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 
@@ -69,30 +111,6 @@ function SpawnPaddle () {
     controller.moveSprite(paddle, paddleSpeed, 0)
 }
 function pickblock (Red: number, Yellow: number, Blue: number) {
-    RedBlock = sprites.create(img`
-        2 2 2 2 2 2 2 2 
-        2 2 2 2 2 2 2 2 
-        2 2 2 2 2 2 2 2 
-        2 2 2 2 2 2 2 2 
-        `, SpriteKind.Player)
-    YellowBlock = sprites.create(img`
-        5 5 5 5 5 5 5 5 
-        5 5 5 5 5 5 5 5 
-        5 5 5 5 5 5 5 5 
-        5 5 5 5 5 5 5 5 
-        `, SpriteKind.Player)
-    BlueBlock = sprites.create(img`
-        8 8 8 8 8 8 8 8 
-        8 8 8 8 8 8 8 8 
-        8 8 8 8 8 8 8 8 
-        8 8 8 8 8 8 8 8 
-        `, SpriteKind.Player)
-    GreenBlock = sprites.create(img`
-        7 7 7 7 7 7 7 7 
-        7 7 7 7 7 7 7 7 
-        7 7 7 7 7 7 7 7 
-        7 7 7 7 7 7 7 7 
-        `, SpriteKind.Player)
     PickBlockVariable = randint(0, 101)
     if (PickBlockVariable <= Red) {
         return RedBlock
@@ -105,6 +123,16 @@ function pickblock (Red: number, Yellow: number, Blue: number) {
     }
     return RedBlock
 }
+sprites.onOverlap(SpriteKind.BlueBlock, SpriteKind.Food, function (sprite, otherSprite) {
+    bounce(otherSprite)
+    otherSprite.setPosition(otherSprite.x, sprite.top + 3)
+    mySprite2 = sprites.create(img`
+        5 5 5 5 5 5 5 5 
+        5 5 5 5 5 5 5 5 
+        5 5 5 5 5 5 5 5 
+        5 5 5 5 5 5 5 5 
+        `, SpriteKind.YellowBlock)
+})
 sprites.onOverlap(SpriteKind.Food, SpriteKind.BoundingBox, function (sprite, otherSprite) {
     sprites.destroy(paddle)
     sprites.destroy(sprite)
@@ -113,20 +141,32 @@ sprites.onOverlap(SpriteKind.Food, SpriteKind.BoundingBox, function (sprite, oth
     pause(500)
     SpawnBall()
 })
+sprites.onOverlap(SpriteKind.GreenBlock, SpriteKind.Food, function (sprite, otherSprite) {
+    bounce(otherSprite)
+    otherSprite.setPosition(otherSprite.x, sprite.top + 3)
+    mySprite2 = sprites.create(img`
+        8 8 8 8 8 8 8 8 
+        8 8 8 8 8 8 8 8 
+        8 8 8 8 8 8 8 8 
+        8 8 8 8 8 8 8 8 
+        `, SpriteKind.BlueBlock)
+})
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
     bounce(otherSprite)
     otherSprite.setPosition(otherSprite.x, sprite.top - 1)
 })
+sprites.onOverlap(SpriteKind.RedBlock, SpriteKind.Food, function (sprite, otherSprite) {
+    bounce(otherSprite)
+    otherSprite.setPosition(otherSprite.x, sprite.top + 3)
+    sprites.destroy(sprite)
+    BlocksOnScreen += -1
+})
 let PickBlockVariable = 0
-let GreenBlock: Sprite = null
-let YellowBlock: Sprite = null
-let RedBlock: Sprite = null
 let paddleSpeed = 0
 let paddle: Sprite = null
 let BallYSPeed = 0
 let ballXSpeed = 0
 let Ball: Sprite = null
-let BlueBlock: Sprite = null
 let mySprite2: Sprite = null
 let CurrentBlock: Sprite = null
 let gap = 0
@@ -136,6 +176,10 @@ let BlocksOnScreen = 0
 let Blue = 0
 let Yellow = 0
 let Red = 0
+let GreenBlock: Sprite = null
+let BlueBlock: Sprite = null
+let YellowBlock: Sprite = null
+let RedBlock: Sprite = null
 let mySprite: Sprite = null
 info.setLife(50)
 SpawnBlocks(1)
