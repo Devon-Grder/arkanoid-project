@@ -4,6 +4,7 @@ namespace SpriteKind {
     export const YellowBlock = SpriteKind.create()
     export const BlueBlock = SpriteKind.create()
     export const GreenBlock = SpriteKind.create()
+    export const PowerUp = SpriteKind.create()
 }
 function createBoundBox () {
     mySprite = sprites.create(img`
@@ -13,6 +14,20 @@ function createBoundBox () {
         ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
         `, SpriteKind.BoundingBox)
     mySprite.setPosition(90, 116)
+    PowerUpBox = sprites.create(img`
+        1 1 1 1 1 1 1 1 1 1 1 
+        1 . . . . . . . . . 1 
+        1 . . . . . . . . . 1 
+        1 . . . . . . . . . 1 
+        1 . . . . . . . . . 1 
+        1 . . . . . . . . . 1 
+        1 . . . . . . . . . 1 
+        1 . . . . . . . . . 1 
+        1 . . . . . . . . . 1 
+        1 . . . . . . . . . 1 
+        1 1 1 1 1 1 1 1 1 1 1 
+        `, SpriteKind.Enemy)
+    PowerUpBox.setPosition(154, 6)
 }
 function SpawnBlocks (Difficulty: number, StartRed: number, StartYellow: number, StartBlue: number) {
     RedBlock = sprites.create(img`
@@ -50,8 +65,8 @@ function SpawnBlocks (Difficulty: number, StartRed: number, StartYellow: number,
     BlockX = 5
     BlockY = 15
     gap = 1
-    for (let index = 0; index <= 0; index++) {
-        for (let index = 0; index <= 0; index++) {
+    for (let index = 0; index <= 2; index++) {
+        for (let index = 0; index <= 15; index++) {
             CurrentBlock = pickblock(RedPercent, YellowPercent, BluePercent)
             mySprite2 = sprites.create(CurrentBlock.image, CurrentBlock.kind())
             mySprite2.setPosition(BlockX, BlockY)
@@ -62,6 +77,23 @@ function SpawnBlocks (Difficulty: number, StartRed: number, StartYellow: number,
         BlockX = 5
     }
 }
+sprites.onOverlap(SpriteKind.Player, SpriteKind.PowerUp, function (sprite, otherSprite) {
+    sprites.destroy(otherSprite)
+    sprites.destroy(DisplayPowerUP)
+    if (otherSprite == PaddleSizePowerUP) {
+        CurrentPowerUP = 1
+        DisplayPowerUP = sprites.create(PaddleSizePowerUP.image, PaddleSizePowerUP.kind())
+        DisplayPowerUP.setPosition(155, 5)
+    } else if (otherSprite == LaserBoltPowerUP) {
+        CurrentPowerUP = 2
+        DisplayPowerUP = sprites.create(LaserBoltPowerUP.image, LaserBoltPowerUP.kind())
+        DisplayPowerUP.setPosition(155, 5)
+    } else if (otherSprite == BallSpeedPowerUP) {
+        CurrentPowerUP = 3
+        DisplayPowerUP = sprites.create(BallSpeedPowerUP.image, BallSpeedPowerUP.kind())
+        DisplayPowerUP.setPosition(155, 5)
+    }
+})
 function bounce (ball: Sprite) {
     if (Ball.vx < 0) {
         ballXSpeed = Ball.vx * 1
@@ -164,7 +196,7 @@ function SpawnPowerUp (ImpactBlock: Sprite) {
         1 9 9 9 9 1 
         . 1 1 1 1 . 
         . . 1 1 . . 
-        `, SpriteKind.Player)
+        `, SpriteKind.PowerUp)
     LaserBoltPowerUP = sprites.create(img`
         . . 1 1 . . 
         . 1 2 2 1 . 
@@ -172,7 +204,7 @@ function SpawnPowerUp (ImpactBlock: Sprite) {
         1 1 2 2 1 1 
         . 1 2 2 1 . 
         . . 1 1 . . 
-        `, SpriteKind.Player)
+        `, SpriteKind.PowerUp)
     BallSpeedPowerUP = sprites.create(img`
         . . 1 1 . . 
         . 1 f f 1 . 
@@ -180,23 +212,38 @@ function SpawnPowerUp (ImpactBlock: Sprite) {
         1 f 1 1 f 1 
         . 1 f f 1 . 
         . . 1 1 . . 
-        `, SpriteKind.Player)
+        `, SpriteKind.PowerUp)
     PowerUPChooser = randint(0, 31)
+    if (PowerUPChooser < 11) {
+        mySprite3 = sprites.create(PaddleSizePowerUP.image, PaddleSizePowerUP.kind())
+        mySprite3.setPosition(ImpactBlock.x, ImpactBlock.y)
+        mySprite3.setVelocity(0, 15)
+    } else if (PowerUPChooser < 21) {
+        mySprite3 = sprites.create(LaserBoltPowerUP.image, LaserBoltPowerUP.kind())
+        mySprite3.setPosition(ImpactBlock.x, ImpactBlock.y)
+        mySprite3.setVelocity(0, 15)
+    } else if (PowerUPChooser < 31) {
+        mySprite3 = sprites.create(BallSpeedPowerUP.image, BallSpeedPowerUP.kind())
+        mySprite3.setPosition(ImpactBlock.x, ImpactBlock.y)
+        mySprite3.setVelocity(0, 15)
+    }
 }
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
     bounce(otherSprite)
     otherSprite.setPosition(otherSprite.x, sprite.top - 1)
 })
+let mySprite3: Sprite = null
 let PowerUPChooser = 0
-let BallSpeedPowerUP: Sprite = null
-let LaserBoltPowerUP: Sprite = null
-let PaddleSizePowerUP: Sprite = null
 let PickBlockVariable = 0
 let paddleSpeed = 0
 let paddle: Sprite = null
 let BallYSPeed = 0
 let ballXSpeed = 0
 let Ball: Sprite = null
+let BallSpeedPowerUP: Sprite = null
+let LaserBoltPowerUP: Sprite = null
+let PaddleSizePowerUP: Sprite = null
+let DisplayPowerUP: Sprite = null
 let mySprite2: Sprite = null
 let CurrentBlock: Sprite = null
 let gap = 0
@@ -210,11 +257,14 @@ let GreenBlock: Sprite = null
 let BlueBlock: Sprite = null
 let YellowBlock: Sprite = null
 let RedBlock: Sprite = null
+let PowerUpBox: Sprite = null
 let mySprite: Sprite = null
+let CurrentPowerUP = 0
 let DifficultyModifier = 0
 let StartRed = 50
 let StartYellow = 85
 let StartBlue = 100
+CurrentPowerUP = 0
 info.setLife(50)
 SpawnBlocks(DifficultyModifier, StartRed, StartYellow, StartBlue)
 SpawnBall()
