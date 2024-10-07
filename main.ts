@@ -101,18 +101,10 @@ function SpawnBlocks (Difficulty: number, StartRed: number, StartYellow: number,
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     if (CurrentPowerUP > 0) {
         if (CurrentPowerUP == 1) {
-            paddle.scale = 1 + 1 * DifficultyModifier
+            paddle.scale = 3 - 0.5 * DifficultyModifier
             pause(5000)
             paddle.scale = 1
             CurrentPowerUP = 0
-            DisplayPowerUP = sprites.create(img`
-                . . . . . . 
-                . . . . . . 
-                . . . . . . 
-                . . . . . . 
-                . . . . . . 
-                . . . . . . 
-                `, SpriteKind.Display)
         } else if (CurrentPowerUP == 2) {
             projectile = sprites.createProjectileFromSprite(img`
                 2 2 
@@ -122,35 +114,15 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
                 2 2 
                 `, paddle, 0, -50)
             CurrentPowerUP = 0
-            DisplayPowerUP = sprites.create(img`
-                . . . . . . 
-                . . . . . . 
-                . . . . . . 
-                . . . . . . 
-                . . . . . . 
-                . . . . . . 
-                `, SpriteKind.Display)
         } else if (CurrentPowerUP == 3) {
-            Ball.setVelocity(randint(20, 80), randint(20, 80))
+            Ball.setVelocity(randint(-80, 80), randint(-80, 80))
             CurrentPowerUP = 0
-            DisplayPowerUP = sprites.create(img`
-                . . . . . . 
-                . . . . . . 
-                . . . . . . 
-                . . . . . . 
-                . . . . . . 
-                . . . . . . 
-                `, SpriteKind.Display)
         }
     }
 })
 function bounce (ball: Sprite) {
-    if (Ball.vx < 0) {
-        ballXSpeed = Ball.vx * 1
-    } else if (Ball.vx > 0) {
-        ballXSpeed = Ball.vx * 1
-    }
-    BallYSPeed = BallYSPeed * -1
+    ballXSpeed = Ball.vx * 1
+    BallYSPeed = Ball.vy * -1
     Ball.setVelocity(ballXSpeed, BallYSPeed)
 }
 sprites.onOverlap(SpriteKind.BlueBlock, SpriteKind.Projectile, function (sprite, otherSprite) {
@@ -170,14 +142,6 @@ function SpawnBall () {
     Ball.setVelocity(ballXSpeed, BallYSPeed)
     Ball.setBounceOnWall(true)
 }
-sprites.onOverlap(SpriteKind.RedBlock, SpriteKind.Food, function (sprite, otherSprite) {
-    bounce(otherSprite)
-    sprites.destroy(sprite)
-    BlocksOnScreen += -1
-    if (randint(0, 100) <= 7) {
-        SpawnPowerUp(otherSprite)
-    }
-})
 sprites.onOverlap(SpriteKind.RedBlock, SpriteKind.Projectile, function (sprite, otherSprite) {
     sprites.destroy(sprite)
     BlocksOnScreen += -1
@@ -197,7 +161,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.LaserBoltPowerUP, function (spri
 })
 sprites.onOverlap(SpriteKind.YellowBlock, SpriteKind.Food, function (sprite, otherSprite) {
     bounce(otherSprite)
-    pause(100)
+    sprites.destroy(sprite)
     mySprite2 = sprites.create(img`
         2 2 2 2 2 2 2 2 
         2 2 2 2 2 2 2 2 
@@ -245,7 +209,7 @@ sprites.onOverlap(SpriteKind.Food, SpriteKind.BoundingBox, function (sprite, oth
 })
 sprites.onOverlap(SpriteKind.BlueBlock, SpriteKind.Food, function (sprite, otherSprite) {
     bounce(otherSprite)
-    pause(100)
+    sprites.destroy(sprite)
     mySprite2 = sprites.create(img`
         5 5 5 5 5 5 5 5 
         5 5 5 5 5 5 5 5 
@@ -259,7 +223,7 @@ sprites.onOverlap(SpriteKind.BlueBlock, SpriteKind.Food, function (sprite, other
 })
 sprites.onOverlap(SpriteKind.GreenBlock, SpriteKind.Food, function (sprite, otherSprite) {
     bounce(otherSprite)
-    pause(100)
+    sprites.destroy(sprite)
     mySprite2 = sprites.create(img`
         8 8 8 8 8 8 8 8 
         8 8 8 8 8 8 8 8 
@@ -270,6 +234,14 @@ sprites.onOverlap(SpriteKind.GreenBlock, SpriteKind.Food, function (sprite, othe
     if (randint(0, 100) <= 7) {
         SpawnPowerUp(otherSprite)
     }
+})
+sprites.onOverlap(SpriteKind.RedBlock, SpriteKind.Food, function (sprite, otherSprite) {
+    bounce(otherSprite)
+    sprites.destroy(sprite)
+    if (randint(0, 100) <= 7) {
+        SpawnPowerUp(otherSprite)
+    }
+    BlocksOnScreen += -1
 })
 function SpawnPowerUp (ImpactBlock: Sprite) {
     PaddleSizePowerUP = sprites.create(img`
