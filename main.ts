@@ -9,6 +9,19 @@ namespace SpriteKind {
     export const LaserBoltPowerUP = SpriteKind.create()
     export const BallSpeedPowerUp = SpriteKind.create()
 }
+sprites.onOverlap(SpriteKind.Player, SpriteKind.BallSpeedPowerUp, function (sprite, otherSprite) {
+    DisplayPowerUP = sprites.create(img`
+        . . 1 1 . . 
+        . 1 f f 1 . 
+        1 f 1 1 f 1 
+        1 f 1 1 f 1 
+        . 1 f f 1 . 
+        . . 1 1 . . 
+        `, SpriteKind.Display)
+    DisplayPowerUP.setPosition(153, 6)
+    CurrentPowerUP = 3
+    sprites.destroy(otherSprite)
+})
 function createBoundBox () {
     mySprite = sprites.create(img`
         ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
@@ -18,33 +31,24 @@ function createBoundBox () {
         `, SpriteKind.BoundingBox)
     mySprite.setPosition(90, 116)
     PowerUpBox = sprites.create(img`
-        1 1 1 1 1 1 1 1 1 1 1 
-        1 . . . . . . . . . 1 
-        1 . . . . . . . . . 1 
-        1 . . . . . . . . . 1 
-        1 . . . . . . . . . 1 
-        1 . . . . . . . . . 1 
-        1 . . . . . . . . . 1 
-        1 . . . . . . . . . 1 
-        1 . . . . . . . . . 1 
-        1 . . . . . . . . . 1 
-        1 1 1 1 1 1 1 1 1 1 1 
+        1 1 1 1 1 1 1 1 1 1 1 1 
+        1 . . . . . . . . . . 1 
+        1 . . . . . . . . . . 1 
+        1 . . . . . . . . . . 1 
+        1 . . . . . . . . . . 1 
+        1 . . . . . . . . . . 1 
+        1 . . . . . . . . . . 1 
+        1 . . . . . . . . . . 1 
+        1 . . . . . . . . . . 1 
+        1 . . . . . . . . . . 1 
+        1 . . . . . . . . . . 1 
+        1 1 1 1 1 1 1 1 1 1 1 1 
         `, SpriteKind.Enemy)
-    PowerUpBox.setPosition(154, 6)
+    PowerUpBox.setPosition(153, 6)
 }
-sprites.onOverlap(SpriteKind.Player, SpriteKind.LaserBoltPowerUP, function (sprite, otherSprite) {
-    DisplayPowerUP = sprites.create(img`
-        . . 1 1 . . 
-        . 1 2 2 1 . 
-        1 1 2 2 1 1 
-        1 1 2 2 1 1 
-        . 1 2 2 1 . 
-        . . 1 1 . . 
-        `, SpriteKind.Display)
-    DisplayPowerUP.setPosition(154, 6)
-    CurrentPowerUP = 2
-    sprites.destroy(otherSprite)
-    mySprite.sayText(CurrentPowerUP)
+sprites.onOverlap(SpriteKind.YellowBlock, SpriteKind.Projectile, function (sprite, otherSprite) {
+    sprites.destroy(sprite)
+    BlocksOnScreen += -1
 })
 function SpawnBlocks (Difficulty: number, StartRed: number, StartYellow: number, StartBlue: number) {
     RedBlock = sprites.create(img`
@@ -94,19 +98,51 @@ function SpawnBlocks (Difficulty: number, StartRed: number, StartYellow: number,
         BlockX = 5
     }
 }
-sprites.onOverlap(SpriteKind.Player, SpriteKind.PaddleSizePowerUP, function (sprite, otherSprite) {
-    DisplayPowerUP = sprites.create(img`
-        . . 1 1 . . 
-        . 1 1 1 1 . 
-        1 9 9 9 9 1 
-        1 9 9 9 9 1 
-        . 1 1 1 1 . 
-        . . 1 1 . . 
-        `, SpriteKind.Display)
-    DisplayPowerUP.setPosition(150, 7)
-    CurrentPowerUP = 1
-    sprites.destroy(otherSprite)
-    mySprite.sayText(CurrentPowerUP)
+controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (CurrentPowerUP > 0) {
+        if (CurrentPowerUP == 1) {
+            paddle.scale = 1 + 1 * DifficultyModifier
+            pause(5000)
+            paddle.scale = 1
+            CurrentPowerUP = 0
+            DisplayPowerUP = sprites.create(img`
+                . . . . . . 
+                . . . . . . 
+                . . . . . . 
+                . . . . . . 
+                . . . . . . 
+                . . . . . . 
+                `, SpriteKind.Display)
+        } else if (CurrentPowerUP == 2) {
+            projectile = sprites.createProjectileFromSprite(img`
+                2 2 
+                2 2 
+                2 2 
+                2 2 
+                2 2 
+                `, paddle, 0, -50)
+            CurrentPowerUP = 0
+            DisplayPowerUP = sprites.create(img`
+                . . . . . . 
+                . . . . . . 
+                . . . . . . 
+                . . . . . . 
+                . . . . . . 
+                . . . . . . 
+                `, SpriteKind.Display)
+        } else if (CurrentPowerUP == 3) {
+            Ball.setVelocity(randint(20, 80), randint(20, 80))
+            CurrentPowerUP = 0
+            DisplayPowerUP = sprites.create(img`
+                . . . . . . 
+                . . . . . . 
+                . . . . . . 
+                . . . . . . 
+                . . . . . . 
+                . . . . . . 
+                `, SpriteKind.Display)
+        }
+    }
 })
 function bounce (ball: Sprite) {
     if (Ball.vx < 0) {
@@ -117,6 +153,10 @@ function bounce (ball: Sprite) {
     BallYSPeed = BallYSPeed * -1
     Ball.setVelocity(ballXSpeed, BallYSPeed)
 }
+sprites.onOverlap(SpriteKind.BlueBlock, SpriteKind.Projectile, function (sprite, otherSprite) {
+    sprites.destroy(sprite)
+    BlocksOnScreen += -1
+})
 function SpawnBall () {
     Ball = sprites.create(img`
         . 1 1 . 
@@ -130,6 +170,31 @@ function SpawnBall () {
     Ball.setVelocity(ballXSpeed, BallYSPeed)
     Ball.setBounceOnWall(true)
 }
+sprites.onOverlap(SpriteKind.RedBlock, SpriteKind.Food, function (sprite, otherSprite) {
+    bounce(otherSprite)
+    sprites.destroy(sprite)
+    BlocksOnScreen += -1
+    if (randint(0, 100) <= 7) {
+        SpawnPowerUp(otherSprite)
+    }
+})
+sprites.onOverlap(SpriteKind.RedBlock, SpriteKind.Projectile, function (sprite, otherSprite) {
+    sprites.destroy(sprite)
+    BlocksOnScreen += -1
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.LaserBoltPowerUP, function (sprite, otherSprite) {
+    DisplayPowerUP = sprites.create(img`
+        . . 1 1 . . 
+        . 1 2 2 1 . 
+        1 1 2 2 1 1 
+        1 1 2 2 1 1 
+        . 1 2 2 1 . 
+        . . 1 1 . . 
+        `, SpriteKind.Display)
+    DisplayPowerUP.setPosition(153, 6)
+    CurrentPowerUP = 2
+    sprites.destroy(otherSprite)
+})
 sprites.onOverlap(SpriteKind.YellowBlock, SpriteKind.Food, function (sprite, otherSprite) {
     bounce(otherSprite)
     pause(100)
@@ -146,11 +211,11 @@ sprites.onOverlap(SpriteKind.YellowBlock, SpriteKind.Food, function (sprite, oth
 })
 function SpawnPaddle () {
     paddle = sprites.create(img`
-        9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
-        9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
-        9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
-        9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
-        9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+        9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 
+        9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 
+        9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 
+        9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 
+        9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 
         `, SpriteKind.Player)
     paddleSpeed = 150
     paddle.setStayInScreen(true)
@@ -206,28 +271,6 @@ sprites.onOverlap(SpriteKind.GreenBlock, SpriteKind.Food, function (sprite, othe
         SpawnPowerUp(otherSprite)
     }
 })
-sprites.onOverlap(SpriteKind.RedBlock, SpriteKind.Food, function (sprite, otherSprite) {
-    bounce(otherSprite)
-    sprites.destroy(sprite)
-    BlocksOnScreen += -1
-    if (randint(0, 100) <= 7) {
-        SpawnPowerUp(otherSprite)
-    }
-})
-sprites.onOverlap(SpriteKind.Player, SpriteKind.BallSpeedPowerUp, function (sprite, otherSprite) {
-    DisplayPowerUP = sprites.create(img`
-        . . 1 1 . . 
-        . 1 f f 1 . 
-        1 f 1 1 f 1 
-        1 f 1 1 f 1 
-        . 1 f f 1 . 
-        . . 1 1 . . 
-        `, SpriteKind.Display)
-    DisplayPowerUP.setPosition(154, 6)
-    CurrentPowerUP = 3
-    sprites.destroy(otherSprite)
-    mySprite.sayText(CurrentPowerUP)
-})
 function SpawnPowerUp (ImpactBlock: Sprite) {
     PaddleSizePowerUP = sprites.create(img`
         . . 1 1 . . 
@@ -271,9 +314,26 @@ function SpawnPowerUp (ImpactBlock: Sprite) {
         mySprite3.setVelocity(0, 15)
     }
 }
+sprites.onOverlap(SpriteKind.GreenBlock, SpriteKind.Projectile, function (sprite, otherSprite) {
+    sprites.destroy(sprite)
+    BlocksOnScreen += -1
+})
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
     bounce(otherSprite)
     otherSprite.setPosition(otherSprite.x, sprite.top - 1)
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.PaddleSizePowerUP, function (sprite, otherSprite) {
+    DisplayPowerUP = sprites.create(img`
+        . . 1 1 . . 
+        . 1 1 1 1 . 
+        1 9 9 9 9 1 
+        1 9 9 9 9 1 
+        . 1 1 1 1 . 
+        . . 1 1 . . 
+        `, SpriteKind.Display)
+    DisplayPowerUP.setPosition(153, 6)
+    CurrentPowerUP = 1
+    sprites.destroy(otherSprite)
 })
 let mySprite3: Sprite = null
 let PowerUPChooser = 0
@@ -282,16 +342,16 @@ let LaserBoltPowerUP: Sprite = null
 let PaddleSizePowerUP: Sprite = null
 let PickBlockVariable = 0
 let paddleSpeed = 0
-let paddle: Sprite = null
 let BallYSPeed = 0
 let ballXSpeed = 0
 let Ball: Sprite = null
+let projectile: Sprite = null
+let paddle: Sprite = null
 let mySprite2: Sprite = null
 let CurrentBlock: Sprite = null
 let gap = 0
 let BlockY = 0
 let BlockX = 0
-let BlocksOnScreen = 0
 let BluePercent = 0
 let YellowPercent = 0
 let RedPercent = 0
@@ -299,11 +359,13 @@ let GreenBlock: Sprite = null
 let BlueBlock: Sprite = null
 let YellowBlock: Sprite = null
 let RedBlock: Sprite = null
-let DisplayPowerUP: Sprite = null
+let BlocksOnScreen = 0
 let PowerUpBox: Sprite = null
 let mySprite: Sprite = null
+let DisplayPowerUP: Sprite = null
 let CurrentPowerUP = 0
 let DifficultyModifier = 0
+DifficultyModifier = 0
 let StartRed = 50
 let StartYellow = 85
 let StartBlue = 100
